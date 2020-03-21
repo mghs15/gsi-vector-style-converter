@@ -68,11 +68,6 @@
 
 ### 今回ためしに作成したもの
 
-※2019年8月以降、更新しておりません。最新版は、上記ツールを用いるか、以下のレポジトリを参照してください。
-* [gsi-vector-mapbox-gl-js](https://github.com/mghs15/gsi-vector-mapbox-gl-js) 地理院地図のベクトルタイルをMapbox GL JSで表示するサンプル
-* [gsi-vector-mapbox-gl-js-png](https://github.com/mghs15/gsi-vector-mapbox-gl-js-png) 地理院地図のベクトルタイルをMapbox GL JSで表示するサンプル（ハッチングにPNGを利用するVer.）
-
-
 <table>
 	<tr>
 		<td><a href="https://mghs15.github.io/gsi-vector-style-converter/sstd.json">標準地図</a></td>
@@ -106,7 +101,7 @@ Mapbox GL JSでそのまま使えるJavascriptコードをコンソールログ�
 
 ※アラートが出ますが、クエリ（URLの?以降の文字列）に何も指定していない限り、問題ありません。
 
-※2019年11月以降、更新しておりません。地理院地図Vectorのアップデートによっては、不具合が発生する場合があります。
+※2019年12月以降、更新しておりません。地理院地図Vectorのアップデートによっては、不具合が発生する場合があります。
 
 出力形式は以下の通り。
 
