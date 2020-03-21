@@ -1,0 +1,33 @@
+{
+  "tilejson": "2.2.0",
+  "tiles": ["https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"],
+  "name": "gsimaps_vector_fulltile",
+  "format": "pbf",
+  "attribution": "<a href=\"https://github.com/gsi-cyberjapan/gsimaps-vector-experiment\">地理院地図Vector（仮称）提供実験</a>",
+  "maxzoom": 17,
+  "minzoom": 4,
+  "bounds": [-180, -85.0511, 180, 85.0511],
+  "center": [139.770832,35.689835,14],
+  "vector_layers": [
+    {"id": "symbol", "description": "symbol"},
+    {"id": "boundary", "description": "boundary"},
+    {"id": "road", "description": "road"},
+    {"id": "railway", "description": "railway"},
+    {"id": "searoute", "description": "searoute"},
+    {"id": "coastline", "description": "coastline"},
+    {"id": "river", "description": "river"},
+    {"id": "lake", "description": "lake"},
+    {"id": "waterarea", "description": "waterarea"},
+    {"id": "elevation", "description": "elevation"},
+    {"id": "transp", "description": "transp"},
+    {"id": "contour", "description": "contour" },
+    {"id": "landforma", "description": "landforma"},
+    {"id": "structurea", "description": "structurea"},
+    {"id": "building", "description": "building"},
+    {"id": "transl", "description": "transl"},
+    {"id": "structurel", "description": "building"},
+    {"id": "landformp", "description": "landformp"},
+    {"id": "landforml", "description": "landforml"},
+    {"id": "label", "description": "label"}
+  ]
+}
