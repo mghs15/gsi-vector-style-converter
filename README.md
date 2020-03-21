@@ -8,7 +8,7 @@
 
 ## モチベーション
 [地理院地図Vector（仮称）提供実験](https://github.com/gsi-cyberjapan/gsimaps-vector-experiment)のスタイル設定ファイルは、
-そのままではMapbox GL JSのスタイル設定ファイル（[Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/)）に利用できないため、なんとか簡単に変換する方法を考えてみた。
+そのままではMapbox GL JSのスタイル設定ファイル（[Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/)）に準拠していないため、なんとか簡単にMapbox Style Specification準拠へ変換する方法を考えてみた。
 
 ## 出来上がったツール
 
@@ -19,6 +19,8 @@
 - index.html
 - [js/src/map/layer-binaryvectortile.js](https://mghs15.github.io/gsi-vector-style-converter/tool/js/src/map/layer-binaryvectortile.js) 
 - css/common.css
+
+※2020年3月21日 [地理院地図Vectorのアップデート](https://www.gsi.go.jp/johofukyu/johofukyu200318.html)に対応済みです。
 
 ### 使い方
 1. 上記サイトで、変換したいスタイルをロードする。
@@ -102,7 +104,9 @@ Mapbox GL JSでそのまま使えるJavascriptコードをコンソールログ�
 
 **ツールのURL**　https://mghs15.github.io/gsi-vector-style-converter/vhatch/
 
-（※アラートが出ますが、クエリ（URLの?以降の文字列）に何も指定していない限り、問題ありません。）
+※アラートが出ますが、クエリ（URLの?以降の文字列）に何も指定していない限り、問題ありません。
+
+※2019年11月以降、更新しておりません。地理院地図Vectorのアップデートによっては、不具合が発生する場合があります。
 
 出力形式は以下の通り。
 
@@ -123,7 +127,7 @@ map.addImage(
 - [単色地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/pale.html#14.01/35.44575/139.9552)
 - [白地図](https://mghs15.github.io/gsi-vector-mapbox-gl-js/blank.html#14.01/35.44575/139.9552)
 
-※この3つのサンプルのレポジトリは[こちら](https://github.com/mghs15/gsi-vector-mapbox-gl-js)
+※この3つのサンプルのレポジトリは[gsi-vector-mapbox-gl-js](https://github.com/mghs15/gsi-vector-mapbox-gl-js)です。
 
 ### fill-pattern用の画像をPNGとして出力する
 
