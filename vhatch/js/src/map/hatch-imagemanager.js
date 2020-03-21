@@ -1,5 +1,3 @@
-var addImageScriptString = "";
-
 GSIBV.Map.HatchImageManager = class extends MA.Class.Base {
   constructor(map) {
     super();
@@ -23,7 +21,6 @@ GSIBV.Map.HatchImageManager = class extends MA.Class.Base {
         continue;
       }
       this._map.addImage(key, this._images[key]);
-      
 
     }
 
@@ -72,88 +69,7 @@ GSIBV.Map.HatchImageManager = class extends MA.Class.Base {
       height: size
     };
 
-    /* 191122 Style用のhatch画像を取り出す------------------------------------------------------------------------ */
-    /* 191224 画像ではなく、配列のまま、addImageのスクリプトとして取り出す。 */
-    var outImgUrl =  this._images[key];
-    
-    var flag = window.location.search;
-    
-    var imageDataText = outImgUrl.data.toString();
-    var imageWidthText = outImgUrl.width;
-    var imageHeightText = outImgUrl.height;
-    
-    /*
-    console.log(outImgUrl.data);
-    console.log(imageDataText);
-    console.log(imageWidthText);
-    console.log(imageHeightText);
-    console.log(key);
-    */
-    
-    var imageText = 'map.addImage(' + "\n" 
-                  + '  "' + key + '", ' + "\n"
-                  + '  {' + "\n"
-                  + '    "width" : ' + imageWidthText + ',' + "\n"
-                  + '    "height" : ' + imageHeightText + ',' + "\n"
-                  + '    "data" : ' + '[' + imageDataText + ']' + "\n"
-                  + "  }" + "\n"
-                  + ');' + "\n" ;
-    
-    addImageScriptString = addImageScriptString + imageText;
-    
-    console.log(addImageScriptString); // 最終的なJavascriptコード。コンソールに出力される。
-    
-    
-    
-    /* 画像として取り出す場合、"?png"のクエリを付与する。*/
-    
-    if(flag == "?png"){
-        var canvas = document.getElementById('canvas');
-        var ctx = canvas.getContext('2d');
-        
-        canvas.width = outImgUrl.width;
-        canvas.height = outImgUrl.height;
-        
-        var outImgData = ctx.createImageData(outImgUrl.width, outImgUrl.height);
-
-        for (var i=0;i < outImgUrl.data.length; i++) {
-          outImgData.data[i]   = outImgUrl.data[i]; //1個ずつ移さないとダメみたい？
-        }
-
-        ctx.putImageData(outImgData,0,0);
-        
-        canvas.toBlob(function(blob) {
-            var url = URL.createObjectURL(blob);
-            
-            var outImgHtml = '<div><div style="border: 1px solid;"><img src="' + url + '"></div><br>' + url + '<br><textarea' + ' cols="100  readonly="readonly" onclick="this.select()">' + key + '.png</textarea></div>';
-            
-            var newWindow = window.open("");
-            newWindow.document.open();
-            newWindow.document.write(outImgHtml);
-            newWindow.document.close();
-            
-            window.open(url, key);
-            
-            console.log(key + '\t' + url + '\t');
-            console.log(canvas.width);
-            
-            
-      //      alert(key); //ダメだった
-      //      URL.revokeObjectURL(url); //これをやると、別ウィンドウで開いた画像をダウンロードできなくなる
-        });
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    
-    /*画像として取り出す場合の処理、ここまで*/
-    
-    /* ここまで ------------------------------------------------------------------------ */
-
-
     this._map.addImage(key, this._images[key], { pixelRatio: 1 });
-    
-
-    
     return key;
   }
   static getSize(type) {
@@ -233,6 +149,7 @@ GSIBV.Map.HatchImageManager = class extends MA.Class.Base {
         }
         break;
     }
+
 
 
 

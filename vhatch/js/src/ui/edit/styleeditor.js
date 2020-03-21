@@ -80,6 +80,10 @@ GSIBV.UI.StyleEditor = class extends GSIBV.UI.Base {
       this._directory = item;
       this._itemList = this._directory.getTargetZoomItemList( this._targetZoom);
       this._item = this._itemList[0];
+    } else if ( item instanceof GSIBV.UI.EditLayerView.SortManager.Item ) {
+      this._directory = item;
+      this._itemList = this._directory.getTargetZoomItemList( this._targetZoom);
+      this._item = this._itemList[0];
     } else  {
       this._directory = undefined;
       this._itemList = undefined;
@@ -135,14 +139,21 @@ GSIBV.UI.StyleEditor = class extends GSIBV.UI.Base {
     this._clearEditList();
   }
 
-  hide() {
+  hide(noEffect) {
     this.clear();
 
-    this._container.style.transition = "max-width 300ms";
-    setTimeout(MA.bind(function () {
+    if ( !noEffect ){
+      this._container.style.transition = "max-width 300ms";
+      setTimeout(MA.bind(function () {
+        MA.DOM.removeClass(this._container, "-ma-expand");
+        this._container.style.maxWidth = '0px';
+      }, this), 0);
+    } else {
+      this._container.style.display = 'none';
       MA.DOM.removeClass(this._container, "-ma-expand");
       this._container.style.maxWidth = '0px';
-    }, this), 0);
+    }
+    this.fire("hide");
   }
   _check() {
     if (!this._editList) return;
@@ -322,13 +333,12 @@ GSIBV.UI.StyleEditor = class extends GSIBV.UI.Base {
 
   }
   _initializeTitle() {
-    var titles = this._item.titles;
     var title = null;
-    if (titles) {
-      
+    
+    if ( this._directory && this._directory instanceof GSIBV.UI.EditLayerView.SortManager.Item ) {
+
       var lang = GSIBV.application.lang;
-      
-      var titleText = this._item.title;
+      var titleText = this._directory.title;
       try {
         if ( GSIBV.CONFIG.LANG[lang.toUpperCase()].VECTORTILE) {
           titleText = GSIBV.CONFIG.LANG[lang.toUpperCase()].VECTORTILE[titleText];
@@ -338,9 +348,9 @@ GSIBV.UI.StyleEditor = class extends GSIBV.UI.Base {
 
       if ( this._itemList ) {
         if ( lang == "en")
-          titleText += '<span class="strong">...etc ' + this._itemList.length +'objects</span>';
+          titleText += '<span class="strong">...' + this._itemList.length +'objects</span>';
         else
-          titleText += '<span class="strong">...他' + this._itemList.length +'件</span>';
+          titleText += '<span class="strong">...' + this._itemList.length +'件</span>';
       }
 
       var title = MA.DOM.create("div");
@@ -348,11 +358,43 @@ GSIBV.UI.StyleEditor = class extends GSIBV.UI.Base {
       MA.DOM.addClass(t, "title");
       t.innerHTML = titleText
       title.appendChild(t);
+
     } else {
-      title = document.createTextNode("unknown");
+
+      var titles = this._item.titles;
+      if (titles) {
+        
+        var lang = GSIBV.application.lang;
+        
+        var titleText = this._item.title;
+        try {
+          if ( GSIBV.CONFIG.LANG[lang.toUpperCase()].VECTORTILE) {
+            titleText = GSIBV.CONFIG.LANG[lang.toUpperCase()].VECTORTILE[titleText];
+            
+          }
+        } catch( e ) {}
+  
+        if ( this._itemList ) {
+          if ( lang == "en")
+            titleText += '<span class="strong">...etc ' + this._itemList.length +'objects</span>';
+          else
+            titleText += '<span class="strong">...他' + this._itemList.length +'件</span>';
+        }
+  
+        var title = MA.DOM.create("div");
+        var t = MA.DOM.create("span");
+        MA.DOM.addClass(t, "title");
+        t.innerHTML = titleText
+        title.appendChild(t);
+      } else {
+        title = document.createTextNode("unknown");
+      }
+
     }
+
     this._titleFrame.innerHTML = '';
     this._titleFrame.appendChild(title);
+
   }
 
   _onScroll() {

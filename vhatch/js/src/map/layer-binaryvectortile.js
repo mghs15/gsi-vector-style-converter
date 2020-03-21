@@ -15,7 +15,7 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
 
     });
   }
-
+  /*
   if (l.url.match(/\{z\}/i) && l.url.match(/\.pbf$/i)) {
     return new GSIBV.Map.Layer.BinaryVectorTile({
       "id": l.id,
@@ -28,6 +28,7 @@ GSIBV.Map.Layer.FILTERS.push(function (l) {
 
     });
   }
+  */
 
 
   return null;
@@ -48,6 +49,7 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
       this._title = (options.title ? options.title : "");
       this._url = (options.url ? options.url : "");
       this._isUserFileLayer = ( options.user ? true : false );
+      this._maxNativeZoom = options.maxNativeZoom;
     }
   }
 
@@ -212,7 +214,6 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
     this.updataLoading();
     container.style.display = 'block';
   }
-
 
   updataLoading() {
     
@@ -591,7 +592,9 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
     this._request = null;
 
     this.fire("load");
-    this._data = new GSIBV.VectorTileData(e.params.response);
+    this._data = new GSIBV.VectorTileData(e.params.response,{
+      maxNativeZoom : this._maxNativeZoom
+    });
     this._data.on("change", MA.bind(this._onDataChange, this));
     if ( this._title != undefined) this._data.title = this._title;
     this._addLayers();
@@ -666,7 +669,6 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
       
       l.list.push( mapboxLayer);
       map.addLayer(mapboxLayer, nextId);
-      
     }
     
     //map.repaint = true;
@@ -724,17 +726,23 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
 
       // ソースを追加
       var source = this._data.source;
+      var sourceId = source.id;
+      var s = JSON.parse(JSON.stringify( source.mapboxSource ) );
+      if (!map.getSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom )) {
+        //console.log(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom );
+        map.addSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom, s );
+      }
+      /*
       var sources = source.mapboxSource;
       var sourceId = source.id;
       for( var i=0; i<sources.length; i++ ) {
-        if (!map.getSource(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom )) {
+        var s = JSON.parse(JSON.stringify( sources[i] ) );
+        if (!map.getSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom )) {
           //console.log(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom );
-          var s = JSON.parse(JSON.stringify( sources[i] ) );
-          
-          map.addSource(sourceId + "-" + sources[i].minzoom + "-" + sources[i].maxzoom, s );
+          map.addSource(sourceId + "-" + s.minzoom + "-" + s.maxzoom, s );
         }
       } 
-      
+      */
       
       // 描画順に並んだレイヤーリスト生成
       if (!this._groupList) {
