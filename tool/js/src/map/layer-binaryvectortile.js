@@ -991,6 +991,7 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                             jsonLayerObjectHorizontal["layout"]["text-field"] = textFieldName.slice();;
                             jsonLayerObjectVertical["layout"]["text-field"] = textFieldName.slice();;
                             
+                            
                         }
                         
                         
@@ -1057,7 +1058,25 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                             //引数なしのslice()で配列の値渡し。
                             jsonLayerObject["layout"]["text-field"] = textFieldName.slice();
                             console.log(jsonLayerObject);
+                            
                         }
+                        
+                        //200328追記（文字傾きの調整）
+                        //傾きを調整するかどうか、arrngAglが270度かどうかを判断材料としたが、例外（1文字ずつ分離している注記）が存在したため保留
+                        /*
+                        if(textField["text-rotate"]){
+                            var textRotate =[
+                              "case",
+                              ["all",["==",["get","arrng"],2],["==",["to-number",["get","arrngAgl"]],270]],["*",["+",["to-number",["get","arrngAgl"]],90],-1],
+                              ["all",["==",["get","arrng"],2],["<",["to-number",["get","arrngAgl"]],270]],["*",["+",["to-number",["get","arrngAgl"]],180],-1],
+                              ["*",["to-number",["get","arrngAgl"]],-1]
+                            ];
+                            
+                            //引数なしのslice()で配列の値渡し。
+                            jsonLayerObject["layout"]["text-rotate"] = textRotate.slice();
+                            console.log(jsonLayerObject);
+                        }
+                        */
                         
                         //JSON文字列に変換
                         jsonLayerContent = JSON.stringify(jsonLayerObject);
