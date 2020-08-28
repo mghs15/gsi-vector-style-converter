@@ -909,25 +909,20 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
         console.log(this);
         
         /* 事前準備 */
-        var myobject1 = {};
-        var mystring1 = "";
-        var spriteType = "pale"; //vpale, vblank, v2pale, v2blank
+        var mylayers = [];
         
         /* spriteのURL判別 */
+        var spriteType = "pale"; //vpale, vblank, v2pale, v2blank
         if((this._id == "vstd")|(this._id == "vlabel")|(this._id == "lvlabel")|(this._id == "v2std")){
                 spriteType = "std";
         }
         
         /* Mapbox用レイヤ情報をまとめる */
-        var idSetAll = []; // id用
-        var idSet = []; // id用
+        var idSetAll = []; // sourceのid用
+        
         for(var i = 0; i < this._addMapboxLayerList.length; i++){
-                myobject1[i] = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);
-                
                 idSetAll.push(this._addMapboxLayerList[i]["mapboxlayer"]["source"]);
                 
-                var comma = ",";
-                if(i == 0){comma = "";}
                 var jsonLayerContent = JSON.stringify(this._addMapboxLayerList[i]["mapboxlayer"]);
                 
                 var verticalFrag = document.getElementById("verticalFragCheck").checked; //縦書きの対応をする場合はtrue
@@ -940,22 +935,9 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                 
                     //<gsi-vertical>がレイヤに含まれている場合に処理を行う
                     if (jsonLayerContent.indexOf('<gsi-vertical>') > 0 ) {
-                        //test
-                        /*
-                        console.log(i);
-                        console.log(jsonLayerContent);
-                        console.log(this._addMapboxLayerList[i]["mapboxlayer"]);
-                        console.log(this._addMapboxLayerList[i]["mapboxlayer"]["layout"]["text-field"]);
-                        console.log(this._addMapboxLayerList[i]["mapboxlayer"]["filter"]);
-                        */
-                        
                         
                         //HorizontalとVerticalを分離
-                        /* これだと、ディープコピーができない。
-                        var jsonLayerObjectHorizontal = Object.assign({}, this._addMapboxLayerList[i]["mapboxlayer"]);
-                        var jsonLayerObjectVertical = Object.assign({}, this._addMapboxLayerList[i]["mapboxlayer"]);
-                        */
-                        /* そのため、以下のようにJSON文字列をパースする。*/
+                        /* JSON文字列をオブジェクトとしてパースして、ディープコピー。*/
                         var jsonLayerObjectHorizontal = JSON.parse(jsonLayerContent);
                         var jsonLayerObjectVertical = JSON.parse(jsonLayerContent);
                         
@@ -966,12 +948,6 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                         var jsonLayerFilterH = ["!=","arrng",2];
                         var jsonLayerFilterV = ["==","arrng",2];
                         
-                        
-                        //text-fieldを変換
-                        /* 以下のままでは、ほかの属性値を持つデータに対応できないので、次のように修正
-                        jsonLayerObjectHorizontal["layout"]["text-field"] = "{knj}";
-                        jsonLayerObjectVertical["layout"]["text-field"] = "{knj}";
-                        */
                         
                         if(textField["text-field"]){
                         
@@ -1013,25 +989,20 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                         jsonLayerObjectVertical["id"] = jsonLayerObjectVertical["id"] + "v";
                         
                         
-                        //JSON文字列に変換
+                        //レイヤとしてスタイルに追加
+                        mylayers.push(jsonLayerObjectHorizontal);
+                        mylayers.push(jsonLayerObjectVertical);
                         
-                        var jsonLayerContentHorizontal = JSON.stringify(jsonLayerObjectHorizontal);
-                        var jsonLayerContentVertical = JSON.stringify(jsonLayerObjectVertical);
+                    }else{ //<gsi-vertical>がレイヤに含まれていない場合の処理
                         
-                        jsonLayerContent = jsonLayerContentHorizontal + ",\n" + jsonLayerContentVertical;
-                        
-                        //test
-                        /*
-                        console.log(jsonLayerObjectHorizontal);
-                        console.log(jsonLayerObjectVertical);
-                        console.log(jsonLayerContent);
-                        */
+                        var jsonLayerObject = JSON.parse(jsonLayerContent);
+                        mylayers.push(jsonLayerObject);
+                    
                     }
                     
                     //縦書きの対応のスクリプト ここまで
                     
                 }else{
-                    
                 //縦書き・横書きを区別しない場合は、<gsi-vertical>を削除する
                 
                     //<gsi-vertical>がレイヤに含まれている場合に処理を行う
@@ -1078,54 +1049,66 @@ GSIBV.Map.Layer.BinaryVectorTile = class extends GSIBV.Map.Layer {
                         }
                         */
                         
+                        //レイヤとしてスタイルに追加
+                        mylayers.push(jsonLayerObject);
+                        
                         //JSON文字列に変換
                         jsonLayerContent = JSON.stringify(jsonLayerObject);
                         
+                    }else{ //<gsi-vertical>がレイヤに含まれていない場合の処理
+                        
+                        var jsonLayerObject = JSON.parse(jsonLayerContent);
+                        mylayers.push(jsonLayerObject);
+                    
                     }
+                    
                 }
-                mystring1 = mystring1 + comma + "\n" + jsonLayerContent; //190803 + 191122
         }
-        console.log( mystring1 ); //ここは必要
+        console.log( JSON.stringify(mylayers) ); //ここは必要
         
         /* source id の整理 */
-        idSet = Array.from(new Set(idSetAll));
+        var idSet = Array.from(new Set(idSetAll));
         console.log( idSet ); //例) ["gsibv-vectortile-source-1-4-17"]
-        var setSourceId = ""; 
+        var setSourceId = {}; 
         for(var i = 0; i < idSet.length; i++){
-                var comma = ",";
-                if(i == 0){comma = "";}
                 
                 //sourceのIDにminzoomとmaxzoomの情報が含まれているので、それを取り出す。
                 var gsiSourceId = idSet[i].split("-");
                 var idMinzoom = gsiSourceId[4];
                 var idMaxzoom = gsiSourceId[5];
-        
-                setSourceId = setSourceId + comma + "\"" + idSet[i] + "\": {\"type\": \"vector\",\"tiles\": [\"https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf\"], \"maxzoom\": " 
-                + idMaxzoom + ", \"minzoom\": " + idMinzoom + ", \"attribution\": \"<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>\"}";
+                
+                setSourceId[idSet[i]] = {
+                  "type": "vector",
+                  "tiles": ["https://cyberjapandata.gsi.go.jp/xyz/experimental_bvmap/{z}/{x}/{y}.pbf"], 
+                  "maxzoom": idMaxzoom * 1,
+                  "minzoom": idMinzoom * 1,
+                  "attribution": "<a href='https://github.com/gsi-cyberjapan/gsimaps-vector-experiment' target='_blank'>地理院地図Vector（仮称）提供実験</a>"
+                }
                 
         }
-        setSourceId = "\"sources\": {" + setSourceId + "}";
         
+        var mystylejson = {
+            "version": 8,
+            "name": "Vector",
+            "metadata": {},
+            "sources": setSourceId,
+            "sprite": "https://cyberjapandata.gsi.go.jp/vector/sprite/" + spriteType,
+            "glyphs": "https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf",
+            "layers": mylayers,
+            "id": "gsi-bv"
+        };
         
         /* spriteやタグの処理を行う　Mapbox用style.jsonに整形する */
-        var mystring1cp = Object.assign({}, mystring1);
-	    mystring1 = mystring1.replace(/std\/\/\//g, ""); // sprite
-	    mystring1 = mystring1.replace(/pale\/\/\//g, ""); // sprite
-	    
-	    /* 200321 縦書き対応処理のelse文中で、<gsi-vertical>とconcatを削除。
-	    if(!verticalFrag){ //縦書き対応している場合は不要
-	        mystring1 = mystring1.replace(/<gsi-vertical>/g, ""); //gsi-vertical
-	        mystring1 = mystring1.replace(/<\/gsi-vertical>/g, ""); //gsi-vertical
-	    }
-	    */
-	    
-	    var mystring1json = "{\"version\": 8,\"name\": \"Vector\",\"metadata\": {}," + setSourceId + ", \"sprite\": \"https://cyberjapandata.gsi.go.jp/vector/sprite/" + spriteType + "\", \"glyphs\": \"https://cyberjapandata.gsi.go.jp/xyz/noto-jp/{fontstack}/{range}.pbf\",\"layers\": [" + mystring1 + "  ],\"id\": \"gsi-bv\"}";
-
-	    /* ダウンロード処理 */
-	    var blob = new Blob([mystring1json], {type: 'application\/json'});
-	    var url = URL.createObjectURL(blob);
-	    const a = document.getElementById('download');
-	    a.href = window.URL.createObjectURL(blob);
+        var mystring1 = JSON.stringify(mystylejson, null, 4)
+        mystring1 = mystring1.replace(/std\/\/\//g, ""); // sprite
+        mystring1 = mystring1.replace(/pale\/\/\//g, ""); // sprite
+        
+        
+        /* ダウンロード処理 */
+        var blob = new Blob([mystring1], {type: 'application\/json'});
+        var url = URL.createObjectURL(blob);
+        const a = document.getElementById('download');
+        a.href = window.URL.createObjectURL(blob);
         
         
         /* ユーザー読込ファイルかどうか判別 */
