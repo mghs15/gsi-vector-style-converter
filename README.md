@@ -197,6 +197,6 @@ PNGが層をfill-patternに用いるサンプルは以下の通り。
 	- ["text-font"](https://docs.mapbox.com/mapbox-gl-js/style-spec/#layout-symbol-text-font)（layout property）の設定が必要だったようだ。
 
 ## その他参考文献
-https://developer.mozilla.org/ja/docs/Web/API/HTMLCanvasElement/toBlob
-https://docs.mapbox.com/mapbox-gl-js/api/
+* https://developer.mozilla.org/ja/docs/Web/API/HTMLCanvasElement/toBlob
+* https://docs.mapbox.com/mapbox-gl-js/api/
 
