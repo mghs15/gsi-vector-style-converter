@@ -90,10 +90,36 @@
 
 ## ポリゴン塗り潰し（fill-pattern）用画像の出力
 
-### fill-pattern用の画像を配列（Uint8Array）として出力する
-上記のツールでは、建物のハッチング等、[fill-pattern](https://docs.mapbox.com/mapbox-gl-js/style-spec/#paint-fill-fill-pattern)で指定する画像は表示されないので、spriteとは別にfill-pattern用の画像準備する必要がある。
+上記のツールでは、建物のハッチング等、[fill-pattern](https://docs.mapbox.com/mapbox-gl-js/style-spec/#paint-fill-fill-pattern)で指定する画像は表示されないので、spriteとは別にfill-pattern用の画像を準備する必要がある。
 
-一方でハッチング用の小さな画像を大量に管理するのはコストがかかる。最終的に、[map.addImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#addimage)を利用して、ハッチング用のパターンとして取り込むため、map.addImageが対応している`{width: number, height: number, data: Uint8Array}`の形式で出力することにした。
+### fill-pattern用の画像をサイト側で都度生成する
+
+fill-patternに指定されたIamgeのidが見つからないときに発火する`styleimagemissing`イベントを利用して、その都度必要なImageを追加する方法である。
+地理院地図Vectorのハッチ用fill-patternに指定されているid名には、パターンや色の情報が含まれているため、ここから必要な画像を復元することができる。
+
+利用方法としては、このレポジトリの`fill-pattern/addGsiHatchImage.js`を取り込んだうえで、以下のようなコードを記述する。
+
+```
+map.on('styleimagemissing', function (e) {
+  
+  var imgid = e.id;
+  var hatchImg = convertGsiHatchImage(imgid);
+  if(!hatchImg) return;
+  
+  map.addImage(imgid, { width: hatchImg.size, height: hatchImg.size, data: hatchImg.data });
+  
+});
+
+```
+
+※実装例（ https://mghs15.github.io/gsi-vector-style-converter/map.html ）では、この方法を用いている。
+
+
+### fill-pattern用の画像を配列（Uint8Array）として出力する
+<details>
+<summary>fill-pattern用の画像を配列（Uint8Array）として出力し、その配列を取り込んで利用する方法</summary>
+
+ハッチング用の小さな画像を大量に管理するのはコストがかかる。最終的に、[map.addImage](https://docs.mapbox.com/mapbox-gl-js/api/#map#addimage)を利用して、ハッチング用のパターンとして取り込むため、map.addImageが対応している`{width: number, height: number, data: Uint8Array}`の形式で出力することにした。
 
 Mapbox GL JSでそのまま使えるJavascriptコードをコンソールログに出力するツールを作成した。
 
@@ -122,8 +148,9 @@ map.addImage(
 
 ※この3つのサンプルのレポジトリは[gsi-vector-mapbox-gl-js](https://github.com/mghs15/gsi-vector-mapbox-gl-js)です。
 
-### fill-pattern用の画像をPNGとして出力する
+</details>
 
+### fill-pattern用の画像をPNGとして出力する
 <details>
 <summary>PNG画像として出力し、その画像を取り込んで利用する方法</summary>
 
@@ -171,4 +198,5 @@ PNGが層をfill-patternに用いるサンプルは以下の通り。
 
 ## その他参考文献
 https://developer.mozilla.org/ja/docs/Web/API/HTMLCanvasElement/toBlob
+https://docs.mapbox.com/mapbox-gl-js/api/
 

@@ -6,6 +6,7 @@
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
 <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.js'></script>
 <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v1.8.1/mapbox-gl.css' rel='stylesheet' />
+<script src='./fill-pattern/addGsiHatchImage.js'></script>
 <style>
 body { margin:0; padding:0; }
 #map {
@@ -80,13 +81,27 @@ var layerList = document.getElementById('menu');
 var inputs = layerList.getElementsByTagName('input');
  
 function switchLayer(layer) {
-var layerId = layer.target.id;
-map.setStyle('./' + layerId +'.json');
+  var layerId = layer.target.id;
+  map.setStyle('./' + layerId +'.json');
 }
  
 for (var i = 0; i < inputs.length; i++) {
-inputs[i].onclick = switchLayer;
+  inputs[i].onclick = switchLayer;
 }
+
+
+//fill-pattern,icon-image用のImageがないときに、追加処理を行う。
+//（参考）https://docs.mapbox.com/mapbox-gl-js/example/add-image-missing-generated/
+map.on('styleimagemissing', function (e) {
+  
+  var imgid = e.id; // id of the missing image
+  var hatchImg = convertGsiHatchImage(imgid);
+  if(!hatchImg) return;
+  
+  map.addImage(imgid, { width: hatchImg.size, height: hatchImg.size, data: hatchImg.data });
+  
+});
+
 
 
 
